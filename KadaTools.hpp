@@ -14,6 +14,8 @@
 #ifndef __KADA_TOOLS__
 #define __KADA_TOOLS__
 
+//Code from KadakawaParser made by BigPet
+
 namespace KadaTools
 {
 
