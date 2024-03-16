@@ -23,7 +23,7 @@
 //Name used to refer to the GRP, DAT, EVT... files
 namespace AssetArchive
 {
-	const uint32 HEADER_SIZE =  0x14;
+	const uint32 HEADER_SIZE = 0x14;
 	
 	struct FileInfo
 	{
@@ -61,8 +61,9 @@ namespace AssetArchive
 		for (uint32 i = 0, pos = HEADER_SIZE; i < files; i++)
 		{
 			uint32 fi = *(uint32*)&data[pos];
-			
-			fileInfo.push_back(FileInfo(((fi & maskVal) * fileScale) + 0x03FF, (fi >> shiftVal) * chunkSize));
+			//memcpy(&fi, &data[pos], sizeof(uint32));
+
+			fileInfo.push_back(FileInfo(((fi & maskVal) * fileScale) + 0x03FF, ((fi >> shiftVal) & ~maskVal) * chunkSize));
 			pos += sizeof(uint32);
 		}
 		
