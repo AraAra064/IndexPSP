@@ -1,0 +1,90 @@
+!AltTextureModB\Assets
+#=MISC=
+1081:VSHumanIcons.png:1:[256, 0.78125f, 1]
+#=Main Menu=
+1196:MainMenu1.png
+1197:MainMenu2.png
+1198:MainMenu3.png
+#=Character Select UI=
+1061:CharacterSelect.png
+#=Touma Kamijou=
+1155:ToumaCS.png
+1055:ToumaOD.png
+1144:ToumaIcon.png
+1166:ToumaAssistIcon.png
+#=Mikoto Misaka=
+1152:MisakaCS.png
+1058:MisakaOD.png
+1223:MisakaIcon.png
+1266:MisakaAssistIcon.png
+#=Stiyl Magnus=
+1171:StiylCS.png
+1143:StiylOD.png
+1156:StiylIcon.png
+1057:StiylAssistIcon.png
+#=Kaori Kanzaki=
+1149:KanzakiCS.png
+1050:KanzakiOD.png
+1231:KanzakiIcon.png
+1123:KanzakiAssistIcon.png
+#=Accelerator=
+1060:AcceleratorCS.png
+1053:AcceleratorOD.png
+1147:AcceleratorIcon.png
+1164:AcceleratorAssistIcon.png
+#=Imouto=
+1163:ImoutoCS.png
+1128:ImoutoOD.png
+1214:ImoutoIcon.png
+1243:ImoutoAssistIcon.png
+#=Shirai Kuroko=
+1158:KurokoCS.png
+1131:KurokoOD.png
+1153:KurokoIcon.png
+1195:KurokoAssistIcon.png
+#=Tsuchimikado Motoharu=
+1063:TsuchimikadoCS.png
+1140:TsuchimikadoOD.png
+1222:TsuchimikadoIcon.png
+1255:TsuchimikadoAssistIcon.png
+#=Sasha Kreutzev=
+1162:SashaCS.png
+1142:SashaOD.png
+1141:SashaIcon.png
+1165:SashaAssistIcon.png
+#=Oriana T=
+1227:OrianaCS.png
+1124:OrianaOD.png
+1212:OrianaIcon.png
+1052:OrianaAssistIcon.png
+#=Itsuwa=
+1066:ItsuwaCS.png
+1129:ItsuwaOD.png
+1161:ItsuwaIcon.png
+1204:ItsuwaAssistIcon.png
+#=Hyouka Kazakiri=
+1250:KazakiriCS.png
+1145:KazakiriOD.png
+1202:KazakiriIcon.png
+1049:KazakiriAssistIcon.png
+#=Acqua of the [THICC] rear=
+1232:AcquaCS.png
+1139:AcquaOD.png
+1146:AcquaIcon.png
+1054:AcquaAssistIcon.png
+#=Shizuri Mugino=
+1221:MuginoCS.png
+1122:MuginoOD.png
+1228:MuginoIcon.png
+1270:MuginoAssistIcon.png
+#=Index=
+1220:IndexCS.png
+1265:IndexOD.png
+1206:IndexAssistIcon.png
+!AltTextureModB\Assets\Title
+1118:Transparent.png
+1119:Accelerator1.png
+1130:Misaka.png
+1135:ToumaIndex1.png
+1136:ToumaIndex2.png
+1138:Accelerator2.png
