@@ -14,6 +14,29 @@ namespace IndexPSM
 	enum FuncObjID {Player1 = 0x01, Player2, Genbu, Byakko, Suzaku, Seiryu};
 	enum class DrawMode {Quads, Tri};
 
+	struct Header
+	{
+		uint32_t magic;
+		uint32_t drawSectionOffset;
+		uint32_t verticiesOffset;
+		uint32_t faceOffset;
+
+		uint32_t colourOffset;
+		uint32_t uvOffset;
+		uint32_t hitDataOffset;
+		uint32_t zeroOffset1;
+
+		uint32_t zero1 = 0;
+		uint32_t zeroOffset2;
+		uint32_t zero2 = 0;
+		uint32_t unknownOffset1;
+
+		uint32_t unknownOffset2;
+		uint32_t objectOffset;
+		uint32_t zeroOffset3;
+		uint32_t zeroOffset4;
+	};
+
 	struct DrawData
 	{
 		uint16_t unknown1;
