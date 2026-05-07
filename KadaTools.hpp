@@ -1,16 +1,5 @@
 #include <vector>
 
-#ifndef int8
-	#define int8 int8_t
-	#define uint8 uint8_t
-	#define int16 int16_t
-	#define uint16 uint16_t
-	#define int32 int32_t
-	#define uint32 uint32_t
-	#define int64 int64_t
-	#define uint64 uint64_t
-#endif
-
 #ifndef __KADA_TOOLS__
 #define __KADA_TOOLS__
 
@@ -21,7 +10,7 @@ namespace KadaTools
 
 struct MipsCpy
 {
-	std::vector<uint8> *container, *container2;
+	std::vector<uint8_t> *container, *container2;
 	
 	long lbu(long adr){
 	if (adr & 0x40000000){
@@ -44,10 +33,10 @@ void sb(long toStore, long location){
 }
 };
 
-std::vector<uint8> DecodeRLE2(std::vector<uint8> &buff){
+std::vector<uint8_t> DecodeRLE2(std::vector<uint8_t> &buff){
 	MipsCpy mips;
 
-	std::vector<uint8> result;
+	std::vector<uint8_t> result;
 	//result.resize(buff.size()*20);
 
 	long a0, a1, a2, a3, v0, v1, t0, t1, t2;

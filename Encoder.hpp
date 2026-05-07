@@ -1,20 +1,5 @@
 #include <vector>
 
-#ifndef int8
-	#define int8 int8_t
-	#define uint8 uint8_t
-	#define int16 int16_t
-	#define uint16 uint16_t
-	#define int32 int32_t
-	#define uint32 uint32_t
-	#define int64 int64_t
-	#define uint64 uint64_t
-#endif
-
-//uint8 = unsigned char (unsigned 8-bit integer)
-//uint16 = unsigned short int (unsigned 16-bit integer)
-//uint32 = unsigned long int (unsigned 32-bit integer)
-
 #ifndef __TOARU_ENCODER__
 #define __TOARU_ENCODER__
 
@@ -22,18 +7,18 @@ namespace IndexEncoder
 {
 
 //Direct copy without RLE (Version 1)
-std::vector<uint8> EncodeHackyRLE(std::vector<uint8> &data)
+std::vector<uint8_t> EncodeHackyRLE(std::vector<uint8_t> &data)
 {
-	std::vector<uint8> retVal;
-	uint32 i = 0;
-	uint32 maxN = 0x1F, n; //31
+	std::vector<uint8_t> retVal;
+	uint32_t i = 0;
+	uint32_t maxN = 0x1F, n; //31
 	
 	while (i < data.size())
 	{
-		n = std::min<uint32>(data.size()-i, maxN);
+		n = std::min<uint32_t>(data.size()-i, maxN);
 		
 		retVal.push_back(n);
-		for (uint32 j = 0; j < n; ++j){retVal.push_back(data[i+j]);
+		for (uint32_t j = 0; j < n; ++j){retVal.push_back(data[i+j]);
 		}
 		
 		i += n;
@@ -45,8 +30,8 @@ std::vector<uint8> EncodeHackyRLE(std::vector<uint8> &data)
 
 struct EncodedData
 {
-	uint8 val;
-	uint32 n;
+	uint8_t val;
+	uint32_t n;
 	
 	EncodedData()
 	{
@@ -57,13 +42,13 @@ struct EncodedData
 
 //Basic version only includes RLE (Version 2)
 //+Encoded version is now smaller than the original
-std::vector<uint8> EncodeRLE(std::vector<uint8> &data)
+std::vector<uint8_t> EncodeRLE(std::vector<uint8_t> &data)
 {
 	std::vector<EncodedData> basicRLE;
-	std::vector<uint8> retVal;
+	std::vector<uint8_t> retVal;
 	
 	//Encode data into RLE
-	for (uint32 i = 0; i < data.size(); ++i)
+	for (uint32_t i = 0; i < data.size(); ++i)
 	{
 		EncodedData d;
 		d.val = data[i];
@@ -77,14 +62,14 @@ std::vector<uint8> EncodeRLE(std::vector<uint8> &data)
 	}
 	
 	//Reformat data
-	for (uint32 i = 0; i < basicRLE.size(); ++i)
+	for (uint32_t i = 0; i < basicRLE.size(); ++i)
 	{
 		EncodedData val = basicRLE[i];
 		bool validRLE;
 		
 		if ((validRLE = (val.n > 4))) //REPEAT_FLAG
 		{
-			uint8 c0 = 0x40, c1;
+			uint8_t c0 = 0x40, c1;
 			c0 |= (0x10 | ((val.n & 0x0F00) >> 8));
 			c1 = (val.n & 0x00FF) - 4;
 			
@@ -92,14 +77,14 @@ std::vector<uint8> EncodeRLE(std::vector<uint8> &data)
 			retVal.push_back(c1);
 			retVal.push_back(val.val);
 		} else { //Direct copy 
-			std::vector<uint8> directData;
+			std::vector<uint8_t> directData;
 			
 			if (!validRLE && val.n != 1)
 			{
-				for (uint32 j = 0; j < val.n; ++j){directData.push_back(val.val);
+				for (uint32_t j = 0; j < val.n; ++j){directData.push_back(val.val);
 				}
 			} else {
-				uint32 n = 0;
+				uint32_t n = 0;
 				while (val.n == 1 && i < basicRLE.size() && n < 31)
 				{
 					directData.push_back(val.val);
@@ -123,13 +108,13 @@ std::vector<uint8> EncodeRLE(std::vector<uint8> &data)
 
 //Version 2.1 (Minor improvements to V2)
 //+Can now repeat a character only using one character
-std::vector<uint8> EncodeRLE2(std::vector<uint8> &data)
+std::vector<uint8_t> EncodeRLE2(std::vector<uint8_t> &data)
 {
 	std::vector<EncodedData> basicRLE;
-	std::vector<uint8> retVal;
+	std::vector<uint8_t> retVal;
 	
 	//Encode data into RLE
-	for (uint32 i = 0; i < data.size(); i++)
+	for (uint32_t i = 0; i < data.size(); i++)
 	{
 		EncodedData d;
 		d.val = data[i];
@@ -143,7 +128,7 @@ std::vector<uint8> EncodeRLE2(std::vector<uint8> &data)
 	}
 	
 	//Reformat data
-	for (uint32 i = 0; i < basicRLE.size(); ++i)
+	for (uint32_t i = 0; i < basicRLE.size(); ++i)
 	{
 		EncodedData val = basicRLE[i];
 		bool validRLE;
@@ -151,7 +136,7 @@ std::vector<uint8> EncodeRLE2(std::vector<uint8> &data)
 		if ((validRLE = (val.n >= 4))) //REPEAT_FLAG
 		{
 			bool multi = false;
-			uint8 c0 = 0x40, c1;
+			uint8_t c0 = 0x40, c1;
 			
 			if (val.n < 0x0F) //Same char version (16 max)
 			{
@@ -167,11 +152,11 @@ std::vector<uint8> EncodeRLE2(std::vector<uint8> &data)
 			}
 			retVal.push_back(val.val);
 		} else { //Direct copy 
-			std::vector<uint8> buffer;
+			std::vector<uint8_t> buffer;
 			
 			while (val.n < 4 && buffer.size()+val.n < 0x1F && i < basicRLE.size())
 			{
-				for (uint32 j = 0; j < val.n; j++){buffer.push_back(val.val);
+				for (uint32_t j = 0; j < val.n; j++){buffer.push_back(val.val);
 				}
 				i++;	
 				if (i < basicRLE.size()){val = basicRLE[i];
@@ -196,13 +181,13 @@ std::vector<uint8> EncodeRLE2(std::vector<uint8> &data)
 //^The limit is now 0x0FFF (4095)
 //+Added mode which makes function do a one to one copy using DirectCopyEX
 //.Added null character to the end of output of all other versions
-std::vector<uint8> EncodeRLE3(std::vector<uint8> &data, bool directMode = false)
+std::vector<uint8_t> EncodeRLE3(std::vector<uint8_t> &data, bool directMode = false)
 {
 	std::vector<EncodedData> basicRLE;
-	std::vector<uint8> retVal;
+	std::vector<uint8_t> retVal;
 	
 	//Encode data into RLE
-	for (uint32 i = 0; i < data.size(); i++)
+	for (uint32_t i = 0; i < data.size(); i++)
 	{
 		EncodedData d;
 		d.val = data[i];
@@ -216,14 +201,14 @@ std::vector<uint8> EncodeRLE3(std::vector<uint8> &data, bool directMode = false)
 	}
 	
 	//Reformat data
-	for (uint32 i = 0; i < basicRLE.size(); ++i)
+	for (uint32_t i = 0; i < basicRLE.size(); ++i)
 	{
 		EncodedData val = basicRLE[i];
 		
 		if (val.n >= 4 && !directMode) //Repeat
 		{
 			bool multi = false;
-			uint8 c0 = 0x40, c1;
+			uint8_t c0 = 0x40, c1;
 			
 			if (val.n < 0x0F) //Single char version (16 max)
 			{
@@ -240,11 +225,11 @@ std::vector<uint8> EncodeRLE3(std::vector<uint8> &data, bool directMode = false)
 			}
 			retVal.push_back(val.val);
 		} else {
-			std::vector<uint8> buffer;
+			std::vector<uint8_t> buffer;
 			
 			while ((val.n < 4 || directMode) && buffer.size()+val.n < 0x1FFF && i < basicRLE.size()) //DirectCopyEX MAX
 			{
-				for (uint32 j = 0; j < val.n; j++){buffer.push_back(val.val);
+				for (uint32_t j = 0; j < val.n; j++){buffer.push_back(val.val);
 				}
 				i++;	
 				val = (i < basicRLE.size() ? basicRLE[i] : val);
@@ -253,7 +238,7 @@ std::vector<uint8> EncodeRLE3(std::vector<uint8> &data, bool directMode = false)
 			
 			if (buffer.size() >= 0x0F) //DirectCopyEX 
 			{
-				uint8 c0 = 0x20, c1;
+				uint8_t c0 = 0x20, c1;
 				uint16 size = buffer.size();
 				c0 |= ((size & 0x1F00) >> 8);
 				c1 = (size & 0x00FF);

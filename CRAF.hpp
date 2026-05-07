@@ -4,8 +4,8 @@
 #include <vector>
 #include <deque>
 
-#include "IndexPSP\KadaTools.hpp"
-#include "IndexPSP\Encoder.hpp"
+#include "KadaTools.hpp"
+#include "Encoder.hpp"
 
 #ifndef __CRAF_EDITOR__
 #define __CRAF_EDITOR__
@@ -13,47 +13,47 @@
 namespace IndexCRAF
 {
 	//Change function names later
-	uint32 GetNumberOfFiles(std::vector<uint8> &crafData){return *((uint32*)&crafData[0x08]);
+	uint32_t GetNumberOfFiles(std::vector<uint8_t> &crafData){return *((uint32_t*)&crafData[0x08]);
 	}
-	uint32 GetCRAFSize(std::vector<uint8> &crafData){return *((uint32*)&crafData[0x04]) + 0x10;
+	uint32_t GetCRAFSize(std::vector<uint8_t> &crafData){return *((uint32_t*)&crafData[0x04]) + 0x10;
 	}
-	uint32 GetCRAFSizeVal(std::vector<uint8> &crafData){return *((uint32*)&crafData[0x04]);
+	uint32_t GetCRAFSizeVal(std::vector<uint8_t> &crafData){return *((uint32_t*)&crafData[0x04]);
 	}
-	uint32 SizeToCRAFVal(uint32 size){return (size + (size % 0x10)) - 0x10;
+	uint32_t SizeToCRAFVal(uint32_t size){return (size + (size % 0x10)) - 0x10;
 	}
 	
-	std::vector<uint8> GetFileData(std::vector<uint8> &crafData, uint32 index, bool decode = true)
+	std::vector<uint8_t> GetFileData(std::vector<uint8_t> &crafData, uint32_t index, bool decode = true)
 	{
-		uint32 pos = 0x20, ro, fs;
-		for (uint32 i = 0; i <= index && pos < crafData.size(); i++)
+		uint32_t pos = 0x20, ro, fs;
+		for (uint32_t i = 0; i <= index && pos < crafData.size(); i++)
 		{
-			ro = *((uint32*)&crafData[pos-0x08]);
-			fs = *((uint32*)&crafData[pos-0x0C]);
+			ro = *((uint32_t*)&crafData[pos-0x08]);
+			fs = *((uint32_t*)&crafData[pos-0x0C]);
 			pos += ro;
 		}
 		pos -= ro;
 		
-		std::vector<uint8> fileData(crafData.begin() + pos, crafData.begin() + pos + fs);
+		std::vector<uint8_t> fileData(crafData.begin() + pos, crafData.begin() + pos + fs);
 		if (decode){fileData = KadaTools::DecodeRLE2(fileData);
 		}
 		
 		return fileData;
 	}
-	uint32 GetFileType(std::vector<uint8> &crafData, uint32 index)
+	uint32_t GetFileType(std::vector<uint8_t> &crafData, uint32_t index)
 	{
-		uint32 pos = 0x20, ro, ft;
-		for (uint32 i = 0; i <= index && pos < crafData.size(); i++)
+		uint32_t pos = 0x20, ro, ft;
+		for (uint32_t i = 0; i <= index && pos < crafData.size(); i++)
 		{
-			ro = *((uint32*)&crafData[pos-0x08]);
-			ft = *((uint32*)&crafData[pos-0x10]);
+			ro = *((uint32_t*)&crafData[pos-0x08]);
+			ft = *((uint32_t*)&crafData[pos-0x10]);
 			pos += ro;
 		}
 		
 		return ft;
 	}
-	std::string GetFileTypeStr(std::vector<uint8> &crafData, uint32 index)
+	std::string GetFileTypeStr(std::vector<uint8_t> &crafData, uint32_t index)
 	{
-		uint32 fileType = GetFileType(crafData, index);
+		uint32_t fileType = GetFileType(crafData, index);
 		
 		std::string str;
 		switch (fileType)
@@ -85,15 +85,15 @@ namespace IndexCRAF
 		return str;
 	}
 	
-	bool CreateFile(std::string fileName, std::deque<std::vector<uint8>> &files)
+	bool CreateFile(std::string fileName, std::deque<std::vector<uint8_t>> &files)
 	{
 		bool retVal;
-		const uint32 zero = 0x00000000;
+		const uint32_t zero = 0x00000000;
 		
-		std::string (*GetFileHeader)(std::vector<uint8>&) = [](std::vector<uint8> &data)->std::string
+		std::string (*GetFileHeader)(std::vector<uint8_t>&) = [](std::vector<uint8_t> &data)->std::string
 		{
 			std::string header;
-			for (uint32 i = 0; i < data.size() && isalnum(data[i]); i++){header += data[i];
+			for (uint32_t i = 0; i < data.size() && isalnum(data[i]); i++){header += data[i];
 			}
 			
 			return header;
@@ -104,19 +104,19 @@ namespace IndexCRAF
 		{
 			//CRAF Header
 			writeFile.write("CRAF", 4); //MAGICNUM
-			uint32 crafSize = 0;
-			writeFile.write((char*)&crafSize, sizeof(uint32)); //CRAFSIZE
-			uint32 v = files.size();
-			writeFile.write((char*)&v, sizeof(uint32)); //NUMFILES
-			writeFile.write((char*)&zero, sizeof(uint32)); //UNKNOWN
+			uint32_t crafSize = 0;
+			writeFile.write((char*)&crafSize, sizeof(uint32_t)); //CRAFSIZE
+			uint32_t v = files.size();
+			writeFile.write((char*)&v, sizeof(uint32_t)); //NUMFILES
+			writeFile.write((char*)&zero, sizeof(uint32_t)); //UNKNOWN
 			
-			for (uint32 i = 0; i < files.size(); i++)
+			for (uint32_t i = 0; i < files.size(); i++)
 			{
 				//File Header
 				//std::cout<<GetFileHeader(files[i])<<std::endl;
 				
-				uint32 fileType;
-				switch (*(uint32*)&files[i][0])
+				uint32_t fileType;
+				switch (*(uint32_t*)&files[i][0])
 				{
 					case 0x36435350: //PSC6
 						fileType = 0x01;
@@ -139,22 +139,22 @@ namespace IndexCRAF
 				}
 				
 				auto fileData = IndexEncoder::EncodeRLE3(files[i]);
-				uint32 fs = fileData.size() + (fileData.size() % 0x04); // + 1;
-				uint32 r = fileData.size() % 0x10;
+				uint32_t fs = fileData.size() + (fileData.size() % 0x04); // + 1;
+				uint32_t r = fileData.size() % 0x10;
 				fileData.resize(fileData.size() + r, 0x00);
-				uint32 ro = fileData.size() + 0x10;
+				uint32_t ro = fileData.size() + 0x10;
 				
-				writeFile.write((char*)&fileType, sizeof(uint32)); //FILETYPE
-				writeFile.write((char*)&fs, sizeof(uint32)); //FILESIZE
-				writeFile.write((char*)&ro, sizeof(uint32)); //ROFFSET
-				writeFile.write((char*)&zero, sizeof(uint32)); //UNKNOWN
+				writeFile.write((char*)&fileType, sizeof(uint32_t)); //FILETYPE
+				writeFile.write((char*)&fs, sizeof(uint32_t)); //FILESIZE
+				writeFile.write((char*)&ro, sizeof(uint32_t)); //ROFFSET
+				writeFile.write((char*)&zero, sizeof(uint32_t)); //UNKNOWN
 				
-				writeFile.write((char*)&fileData[0], fileData.size() * sizeof(uint8)); //Encoded file data
-				crafSize = (uint32)writeFile.tellp() - 0x10; //- r + 1;
+				writeFile.write((char*)&fileData[0], fileData.size() * sizeof(uint8_t)); //Encoded file data
+				crafSize = (uint32_t)writeFile.tellp() - 0x10; //- r + 1;
 			}
 			
 			writeFile.seekp(0x04);
-			writeFile.write((char*)&crafSize, sizeof(uint32));
+			writeFile.write((char*)&crafSize, sizeof(uint32_t));
 			
 			writeFile.close();
 		}
