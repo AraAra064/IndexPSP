@@ -7,8 +7,8 @@
 #include "KadaTools.hpp"
 #include "Encoder.hpp"
 
-#ifndef __CRAF_EDITOR__
-#define __CRAF_EDITOR__
+#ifndef __INDEX_CRAF__
+#define __INDEX_CRAF__
 
 namespace IndexCRAF
 {
@@ -38,6 +38,17 @@ namespace IndexCRAF
 		}
 		
 		return fileData;
+	}
+	std::deque<std::vector<uint8_t>> GetAllFiles(std::vector<uint8_t>& crafData, bool decode = true)
+	{
+		std::deque<std::vector<uint8_t>> files(GetNumberOfFiles(crafData));
+
+		for (int i = 0; i < files.size(); i++)
+		{
+			files[i] = GetFileData(crafData, i, decode);
+		}
+
+		return files;
 	}
 	uint32_t GetFileType(std::vector<uint8_t> &crafData, uint32_t index)
 	{
@@ -85,7 +96,7 @@ namespace IndexCRAF
 		return str;
 	}
 	
-	bool CreateFile(std::string fileName, std::deque<std::vector<uint8_t>> &files)
+	bool CreateCRAF(std::string fileName, std::deque<std::vector<uint8_t>> &files)
 	{
 		bool retVal;
 		const uint32_t zero = 0x00000000;
