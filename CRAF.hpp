@@ -81,15 +81,15 @@ namespace IndexCRAF
 			case 0x04:
 				str = "PTC";
 				break;
-			case 0x05:
-				str = "UNKNOWN BINARY";
+			case 0x05: //Unknown bin
+				str = "BIN";
 				break;
 			case 0x06:
 				str = "SSAD";
 				break;
 			
-			default:
-				str = "NOT KNOWN";
+			default: //Unknown
+				str = "XBIN";
 				break;
 		}
 		
