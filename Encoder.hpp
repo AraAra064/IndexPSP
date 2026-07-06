@@ -52,10 +52,12 @@ std::vector<uint8_t> EncodeRLE(std::vector<uint8_t> &data)
 	{
 		EncodedData d;
 		d.val = data[i];
-		while (data[i] == data[i+1] && i < data.size() && d.n < 0x00FF)
+		while ((i + 1) < data.size() && d.n < 0x0FFF)
 		{
-			++d.n;
-			++i;
+			if (data[i] != data[i + 1]){break;
+			}
+			d.n++;
+			i++;
 		}
 		
 		basicRLE.push_back(d);
@@ -118,8 +120,10 @@ std::vector<uint8_t> EncodeRLE2(std::vector<uint8_t> &data)
 	{
 		EncodedData d;
 		d.val = data[i];
-		while (data[i] == data[i+1] && i < data.size() && d.n < 0x00FF)
+		while ((i + 1) < data.size() && d.n < 0x0FFF)
 		{
+			if (data[i] != data[i + 1]){break;
+			}
 			d.n++;
 			i++;
 		}
@@ -175,7 +179,7 @@ std::vector<uint8_t> EncodeRLE2(std::vector<uint8_t> &data)
 }
 
 
-//Version 2.5 (Not a big enough change to be called V3, the final version I'll make)
+//Version 2.2 
 //+Added DirectCopyEX (can copy one to one with longer range)
 //+Fixed bug which limited the number of times a character could be repeated to 0xFF (255)
 //^The limit is now 0x0FFF (4095)
@@ -191,8 +195,10 @@ std::vector<uint8_t> EncodeRLE3(std::vector<uint8_t> &data, bool directMode = fa
 	{
 		EncodedData d;
 		d.val = data[i];
-		while (data[i] == data[i+1] && i < data.size() && d.n < 0x0FFF)
+		while ((i + 1) < data.size() && d.n < 0x0FFF)
 		{
+			if (data[i] != data[i + 1]){break;
+			}
 			d.n++;
 			i++;
 		}
