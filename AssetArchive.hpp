@@ -1,5 +1,6 @@
 #include <vector>
 #include <fstream>
+#include <deque>
 
 #include "KadaTools.hpp"
 #include "Encoder.hpp"
