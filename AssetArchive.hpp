@@ -72,7 +72,7 @@ namespace AssetArchive
 			uint32_t pos = fileInfo[index].offset;
 			uint32_t size = fileInfo[index].size;
 			
-			if ((pos + size) < data.size()) //ADV silly
+			if ((pos + size - 1) < data.size()) //ADV silly
 			{
 				fileData.resize(size);
 				memcpy(&fileData[0], &data[pos], size);
