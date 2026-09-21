@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 
 #ifndef __SHTXPS_PARSER__
 #define __SHTXPS_PARSER__
@@ -71,27 +72,28 @@ namespace IndexSHTXPS
 
 	ImageInfo GetImageInfo(std::vector<uint8_t>& shtxData)
 	{
+		Header* h = (Header*)shtxData.data();
 		ImageInfo ii;
-		ii.numColours = *(uint16_t*)&shtxData[0x06];
-		ii.width = *(uint16_t*)&shtxData[0x0A];
-		ii.height = *(uint16_t*)&shtxData[0x0C];
+		ii.numColours = h->numColours;
+		ii.width = h->width;
+		ii.height = h->height;
 		return ii;
 	}
 
 	std::vector<uint8_t> CreateHeader(ImageInfo info)
 	{
-		std::vector<uint8_t> header(C_HEADERSIZE, 0x00);
-		memcpy(&header[0x00], "SHTXPS", 0x06);
-		memcpy(&header[0x06], &info.numColours, 0x02);
-		header[0x08] = 1; //"rendermode"
-		memcpy(&header[0x0A], &info.width, 0x02);
-		memcpy(&header[0x0C], &info.height, 0x02);
-		header[0x0E] = std::log2f(info.width);
-		header[0x0F] = std::log2f(info.height);
-		uint16_t size = info.width * info.height;
-		memcpy(&header[0x10], &size, 0x02);
+		Header h;
+		h.numColours = info.numColours;
+		h.width = info.width;
+		h.height = info.height;
+		h.l2Width = std::log2f(info.width);
+		h.l2Height = std::log2f(info.height);
+		h.size = info.width * info.height;
 
-		return header;
+		uint8_t* it = (uint8_t*)&h;
+		uint8_t* it2 = (uint8_t*)&h + sizeof(Header);
+
+		return std::vector<uint8_t>(it, it2);
 	}
 
 	//Returns an array of pixel data, defaults to (0xAARRGGBB)
@@ -125,34 +127,43 @@ namespace IndexSHTXPS
 		return pixels;
 	}
 
-	//Expects a maximum of 256 different colours
-	//No idea what happens when there is more than 256
-	std::vector<uint8_t> CreateSHTX(std::vector<uint32_t>& pixels, uint32_t& outWidth, uint32_t& outHeight)
+	//Expects a maximum of 256 different colours, in 0xAABBGGRR
+	//Undefined behaviour when the total unique colours is greater than 256
+	//Returns a valid SHTXPS file to be added to the game
+	std::vector<uint8_t> CreateSHTX(std::vector<uint32_t>& pixels, uint32_t outWidth, uint32_t outHeight, std::vector<uint32_t> colourTable)
 	{
 		std::vector<uint8_t> shtxData;
 		
 		if (!pixels.empty())
 		{
-			std::vector<uint32_t> colourTable;
-			for (uint32_t p : pixels){colourTable.push_back(BGRAToSHTX(p));
+			if (colourTable.empty())
+			{
+				//colourTable = pixels;
+				//std::sort(colourTable.begin(), colourTable.end());
+				//colourTable.erase(std::unique(colourTable.begin(), colourTable.end()), colourTable.end());
+				
+				return shtxData;
 			}
-			std::sort(colourTable.begin(), colourTable.end());
-			colourTable.erase(std::unique(colourTable.begin(), colourTable.end()), colourTable.end());
-			std::sort(colourTable.begin(), colourTable.end());
+
 			uint32_t colourTableSize = colourTable.size() * 0x04;
 			uint32_t colourIndexSize = (outWidth * outHeight);
 			shtxData.resize(C_HEADERSIZE + colourTableSize + colourIndexSize);
 
 			auto header = CreateHeader(ImageInfo(colourTable.size(), outWidth, outHeight));
 			memcpy(&shtxData[0], &header[0], C_HEADERSIZE);
-			memcpy(&shtxData[0], &colourTable[0], colourTableSize);
+			memcpy(&shtxData[C_HEADERSIZE], &colourTable[0], colourTableSize);
+
+			std::unordered_map<uint32_t, uint16_t> cIndexTable;
+			for (uint16_t index = 0; index < colourTable.size(); index++)
+			{
+				cIndexTable[colourTable[index]] = index;
+			}
 
 			for (uint32_t i = 0; i < colourIndexSize; i++)
 			{
-				uint32_t c = BGRAToSHTX(pixels[i]);
-				auto t = std::lower_bound(colourTable.begin(), colourTable.end(), c);
-				uint16_t index = std::distance(colourTable.begin(), t);
-
+				uint32_t c = pixels[i];
+				uint16_t index = cIndexTable[c];
+			
 				shtxData[C_HEADERSIZE + colourTableSize + i] = index;
 			}
 		}
